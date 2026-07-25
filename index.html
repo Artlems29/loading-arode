@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Arode Studio</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#d9d9d7">
+  <link rel="icon" href="data:,">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      background: #d9d9d7;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* 100dvh suit la barre d'URL mobile ; position fixed empêche tout scroll */
+    #center {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    /* Le 3e terme du min() borne la hauteur en paysage (16/9 x 60vh = 106vh).
+       Le masque estompe les bords : la vidéo se fond dans le fond de page. */
+    #wave {
+      width: min(620px, 82vw, 106vh);
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      -webkit-mask-image: radial-gradient(ellipse at center, #000 52%, transparent 76%);
+      mask-image: radial-gradient(ellipse at center, #000 52%, transparent 76%);
+      pointer-events: auto;
+    }
+
+    #status {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: clamp(0.75rem, 3vw, 1rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    #dots::after {
+      content: "";
+      animation: dots 1.6s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%   { content: ""; }
+      25%  { content: "."; }
+      50%  { content: ".."; }
+      75%  { content: "..."; }
+    }
+
+    /* Curseur surfer : desktop uniquement, jamais rendu sur mobile */
+    #surfer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 70px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      will-change: transform;
+      z-index: 10;
+      display: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      #surfer { display: block; }
+      #wave:hover { cursor: none; }
+      body.surfing #surfer { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #dots::after { animation: none; content: "..."; }
+    }
+  </style>
+</head>
+<body>
+  <div id="center">
+    <video id="wave" autoplay muted loop playsinline poster="assets/poster.jpg">
+      <source src="assets/wave.mp4" type="video/mp4">
+      <source src="assets/wave.webm" type="video/webm">
+    </video>
+    <p id="status">Arode-V2-Loading<span id="dots"></span></p>
+  </div>
+
+  <img id="surfer" src="assets/surfer.svg" alt="">
+
+  <script>
+    const wave = document.getElementById('wave');
+    const surfer = document.getElementById('surfer');
+
+    // iOS en mode économie d'énergie bloque l'autoplay : on relance au 1er contact
+    wave.play().catch(() => {
+      const resume = () => {
+        wave.play().catch(() => {});
+        document.removeEventListener('touchstart', resume);
+        document.removeEventListener('click', resume);
+      };
+      document.addEventListener('touchstart', resume, { once: true });
+      document.addEventListener('click', resume, { once: true });
+    });
+
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      wave.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'mouse') document.body.classList.add('surfing');
+      });
+
+      wave.addEventListener('pointerleave', () => {
+        document.body.classList.remove('surfing');
+      });
+
+      document.addEventListener('pointermove', (e) => {
+        surfer.style.transform = `translate3d(${e.clientX - 35}px, ${e.clientY - 43}px, 0)`;
+      });
+    }
+  </script>
+</body>
+</html>
