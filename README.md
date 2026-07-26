@@ -28,5 +28,6 @@ Vérifier que le déploiement V2 est vert **avant** de retirer le domaine ici.
 
 ## Assets
 
-- `assets/wave.mp4` / `assets/wave.webm` — animation d'encre, filigrane Gemini retiré (filtre ffmpeg `delogo`)
-- `assets/surfer.svg` — curseur au survol du logo
+- `assets/wave.mp4` / `assets/wave.webm` — animation d'encre, source `Arode-loading-animation.mov` réencodée en 1280x720 sans piste audio
+- `assets/poster.jpg` — première image, affichée si l'autoplay est bloqué
+- `assets/surfer.svg` — curseur au survol de la vidéo
